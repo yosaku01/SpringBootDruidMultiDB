@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="OFF">
+    <properties>
+        <property name="logPath">./logs/</property>
+    </properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT" ignoreExceptions="false">
+            <PatternLayout pattern="%d [%t] %-5p %c - %m%n"/>
+            <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Console>
+        <RollingFile name="infoLog" fileName="${logPath}/multidb_info.log"
+                     filePattern="${logPath}/multidb_info-%d{yyyy-MM-dd}.log" append="true" immediateFlush="true">
+            <PatternLayout pattern="%d [%t] %-5p %c - %m%n" />
+            <TimeBasedTriggeringPolicy />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+            <Filters>
+                <ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <RollingFile name="errorLog" fileName="${logPath}/multidb_error.log"
+                     filePattern="${logPath}/multidb_error-%d{yyyy-MM-dd}.log" append="true" immediateFlush="true">
+            <PatternLayout pattern="%d [%t] %-5p %c - %m%n" />
+            <TimeBasedTriggeringPolicy />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+            <Filters>
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <AsyncLogger name="org.springframework.*" level="INFO"/>
+        <AsyncLogger name="com.rick" level="INFO" additivity="false">
+            <AppenderRef ref="infoLog" />
+            <AppenderRef ref="errorLog" />
+            <AppenderRef ref="Console" />
+        </AsyncLogger>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>

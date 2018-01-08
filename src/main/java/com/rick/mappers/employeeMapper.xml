@@ -1,0 +1,72 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rick.mappers.StudentMapper">
+    <resultMap id="studentResultMap" type="com.rick.entities.Student">
+        <id column="ID" property="id" />
+        <result column="NAME" property="name" />
+        <result column="CLASS_NAME" property="className" />
+        <result column="CREATE_DATE" property="createDate" />
+        <result column="UPDATE_DATE" property="updateDate" />
+    </resultMap>
+    <select id="findStudentById" resultMap="studentResultMap" resultType="map">
+        select ID,NAME,CLASS_NAME,CREATE_DATE,UPDATE_DATE from student WHERE ID=#{id}
+    </select>
+    <select id="findStudentByCondition" parameterType="Map" resultMap="studentResultMap">
+        select ID,NAME,CLASS_NAME,CREATE_DATE,UPDATE_DATE from student
+        <where>
+            <if test="_parameter.containsKey('name')">
+                NAME like #{name}
+            </if>
+            <if test="_parameter.containsKey('className')">
+                AND CLASS_NAME like #{className}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertStudent" parameterType="com.rick.entities.Student" useGeneratedKeys="true" keyProperty="id">
+        insert into student(NAME,CLASS_NAME,CREATE_DATE,UPDATE_DATE) values(#{name},#{className},CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP())
+    </insert>
+
+    <insert id="insertStudents" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id" >
+    insert into student(
+                          NAME,
+                          CLASS_NAME,
+                          CREATE_DATE,
+                          UPDATE_DATE)
+                          values
+        <foreach item="item" collection="list" separator="," index="index">
+            (
+              #{item.name},
+              #{item.className},
+              CURRENT_TIMESTAMP(),
+              CURRENT_TIMESTAMP()
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteStudentById">
+        delete from student where ID=#{id}
+    </delete>
+
+    <delete id="deleteStudentByCondition" parameterType="Map">
+        delete from student
+        <where>
+            <if test="_parameter.containsKey('name')">
+                NAME like #{name}
+            </if>
+            <if test="_parameter.containsKey('className')">
+                AND CLASS_NAME like #{className}
+            </if>
+        </where>
+    </delete>
+
+    <update id="updateStudent">
+        update student set
+            NAME = #{name},
+            CLASS_NAME = #{className},
+            UPDATE_DATE = CURRENT_TIMESTAMP()
+        where id = #{id}
+    </update>
+</mapper>
